@@ -131,6 +131,7 @@ def main():
 	Main function for check_cfm_state.py 
 	"""
 	
+	ErrorState=0
 	# Parse options and arguments
 
 	parser = buildParser()
