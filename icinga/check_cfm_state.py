@@ -12,7 +12,7 @@ from collections import defaultdict
 MEPAdminState = {'1' : 'disabled', '2' : 'enabled'}
 MEPOperState = {'1' : 'disabled', '2' : 'enabled', '3' : 'hold', '4' : 'holdLocked'}
 
-# Parse and check arguuments
+# Parse and check arguments
 def buildParser():
 	"""
 	Prepare parsing of command line options
@@ -65,36 +65,41 @@ def snmp_walk(options,host,oid):
  				Community=options.community)
 	return var 
 
-# Loop through EP list and detect errors and generate output
 	
 def checkMEP_CCM(mepEntry):
 	"""
-	Checks a entry from the MEP Dictionary and returns 1 if there are any CCM errorflags detected. Also output is generated and printed. 
+	Checks a entry from the MEP Dictionary and returns 1 if there are any CCM errorflags detected.
+	Also output is generated and printed. 
 	"""
 
-	ErrorState = 0
-	
 	if mepEntry['FailureFlag'] == '1': mepEntry['ErrorMessage'] += " -- Failure Error Detected!"
 	if mepEntry['CCMErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- CCM Error Detected!"
         if mepEntry['RDIErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- RDI Error Detected!"
 	if (mepEntry['AdminState'] <> 'enabled') | (mepEntry['OperState'] <> 'enabled') : 
 		mepEntry['ErrorMessage'] += " -- WARNING AdminState: " + mepEntry['AdminState'] + " OperState: " + mepEntry['OperState']
+        if len(mepEntry['ErrorMessage']) > 0:
+                ErrorState = 1
+                mepEntry['IcingaState'] = "WARNING"
+        else:
+                ErrorState = 0
+                mepEntry['IcingaState'] = "OK"
 	
-	print 'MEP {0:<4} Level: {1} MAID: {2:<20} CCM-ErrorFlags: {3}{4}{5} {6}'.format(
+	print 'MEP {0:<4} {1} - Level: {2} MAID: {3:<20} CCM-ErrorFlags: {4}{5}{6} {7}'.format(
 									mepEntry['ID'],
+									mepEntry['IcingaState'],
 									mepEntry['MdLevel'],
 									mepEntry['MAIDString'], 
 									mepEntry['FailureFlag'], 
 									mepEntry['CCMErrorFlag'], 
 									mepEntry['RDIErrorFlag'], 	
 									mepEntry['ErrorMessage']) 
-	if len(mepEntry['ErrorMessage']) > 0: ErrorState = 1
 	return ErrorState
 
 
 def buildMEPDictionary(options,host):
 	"""
-	This function performs snmpwalks to generate a dictionary of the RemoteMEP table from the Ciena MIB. Some entries are parsed before the dictionary is returned
+	This function performs snmpwalks to generate a dictionary of the RemoteMEP table from the Ciena MIB.
+	Some entries are parsed before the dictionary is returned.
 	"""
 
         # Retreive CFM Service data
@@ -122,7 +127,8 @@ def buildMEPDictionary(options,host):
                 MEPlist[var]['ErrorMessage']=""
                 MEPlist[var]['AdminState'] = MEPAdminState[MEPlist[var]['AdminState']]
                 MEPlist[var]['OperState'] = MEPAdminState[MEPlist[var]['OperState']]
-	
+		MEPlist[var]['IcingaState']=""
+
 	return MEPlist
 
 
