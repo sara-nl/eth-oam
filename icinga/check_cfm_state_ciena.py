@@ -65,36 +65,6 @@ def snmp_walk(options,host,oid):
  				Community=options.community)
 	return var 
 
-	
-def checkMEP_CCM(mepEntry):
-	"""
-	Checks a entry from the MEP Dictionary and returns 1 if there are any CCM errorflags detected.
-	Also output is generated and printed. 
-	"""
-
-	if mepEntry['FailureFlag'] == '1': mepEntry['ErrorMessage'] += " -- Failure Error Detected!"
-	if mepEntry['CCMErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- CCM Error Detected!"
-        if mepEntry['RDIErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- RDI Error Detected!"
-	if (mepEntry['AdminState'] <> 'enabled') | (mepEntry['OperState'] <> 'enabled') : 
-		mepEntry['ErrorMessage'] += " -- WARNING AdminState: " + mepEntry['AdminState'] + " OperState: " + mepEntry['OperState']
-        if len(mepEntry['ErrorMessage']) > 0:
-                ErrorState = 1
-                mepEntry['IcingaState'] = "WARNING"
-        else:
-                ErrorState = 0
-                mepEntry['IcingaState'] = "OK"
-	
-	print 'MEP {0:<4} {1} - Level: {2} MAID: {3:<20} CCM-ErrorFlags: {4}{5}{6} {7}'.format(
-									mepEntry['ID'],
-									mepEntry['IcingaState'],
-									mepEntry['MdLevel'],
-									mepEntry['MAIDString'], 
-									mepEntry['FailureFlag'], 
-									mepEntry['CCMErrorFlag'], 
-									mepEntry['RDIErrorFlag'], 	
-									mepEntry['ErrorMessage']) 
-	return ErrorState
-
 
 def buildMEPDictionary(options,host):
 	"""
@@ -126,10 +96,37 @@ def buildMEPDictionary(options,host):
                 MEPlist[var]['MdLevel'] = Servicelist[serviceIndex].get('MdLevel')
                 MEPlist[var]['ErrorMessage']=""
                 MEPlist[var]['AdminState'] = MEPAdminState[MEPlist[var]['AdminState']]
-                MEPlist[var]['OperState'] = MEPAdminState[MEPlist[var]['OperState']]
+                MEPlist[var]['OperState'] = MEPOperState[MEPlist[var]['OperState']]
 		MEPlist[var]['IcingaState']=""
 
 	return MEPlist
+
+
+def checkMEP_CCM(mepEntry):
+        """
+        Checks a entry from the MEP Dictionary and returns 1 if there are any CCM errorflags detected.
+        Output for Icinga / Nagios is generated and printed.
+        """
+
+        if mepEntry['FailureFlag'] == '1': mepEntry['ErrorMessage'] += " -- Failure Error Detected!"
+        if mepEntry['CCMErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- CCM Error Detected!"
+        if mepEntry['RDIErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- RDI Error Detected!"
+        if (mepEntry['AdminState'] <> 'enabled') | (mepEntry['OperState'] <> 'enabled') :
+                mepEntry['ErrorMessage'] += " -- WARNING AdminState: " + mepEntry['AdminState'] + " OperState: " + mepEntry['OperState']
+        if len(mepEntry['ErrorMessage']) > 0:
+                ErrorState = 1
+                mepEntry['IcingaState'] = "WARNING"
+        else:
+                ErrorState = 0
+                mepEntry['IcingaState'] = "OK"
+
+        print 'MEP {0:<4} {1} - Level: {2} MAID: {3:<20} {4}'.format(
+                                                                        mepEntry['ID'],
+                                                                        mepEntry['IcingaState'],
+                                                                        mepEntry['MdLevel'],
+                                                                        mepEntry['MAIDString'],
+                                                                        mepEntry['ErrorMessage'])
+        return ErrorState
 
 
 def main():
