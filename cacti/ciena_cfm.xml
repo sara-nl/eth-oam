@@ -1,0 +1,68 @@
+<interface>
+	<name>Get Ciena OAM CFM</name>
+	<description>Queries a host for a list of CFM related variables</description>
+	<oid_index>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1</oid_index>
+	<index_order>RemoteMEPID</index_order>
+	<oid_index_parse>OID/REGEXP:.*\.([0-9]+\.[0-9]+)$</oid_index_parse>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+
+	<fields>
+                <RemoteMEPIndex>
+                        <name>Index</name>
+                        <method>walk</method>
+                        <source>index</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1</oid>
+                </RemoteMEPIndex>
+		<RemoteMEPID>
+			<name>Remote MEP ID</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1.1</oid>
+		</RemoteMEPID>
+                <AdminState>
+                        <name>Admin State</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1.2</oid>
+                </AdminState>
+                <OperState>
+                        <name>Oper State</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1.3</oid>
+                </OperState>
+                <MacAddr>
+                        <name>MAC Address</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1.5</oid>
+                </MacAddr>
+		<RemoteMEPDelay>
+			<name>Delay</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1.12</oid>
+		</RemoteMEPDelay>
+                <RemoteMEPJitter>
+                        <name>Jitter</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.6141.2.60.35.1.8.1.1.13</oid>
+                </RemoteMEPJitter>
+
+
+
+
+
+
+	</fields>
+</interface>
+
