@@ -7,4 +7,4 @@ Currently there are two subdirectories:
 * Icinga
 * Cacti
 
-Please refer to the local README in these subdirectories for more detailed information.
+Please refer to the [Eth-OAM Wiki](https://github.com/sara-nl/eth-oam/wiki/Ethernet-OAM-in-Icinga-and-Cacti---HOWTO) for more detailed information.
