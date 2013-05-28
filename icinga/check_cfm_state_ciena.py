@@ -95,10 +95,9 @@ def buildMEPDictionary(options,host):
                 MEPlist[var]['MAIDString'] = CFMMaid[2:MdStrLen+2] + "_" + Servicelist[serviceIndex].get('CfmMaintAssocName')
                 MEPlist[var]['MdLevel'] = Servicelist[serviceIndex].get('MdLevel')
                 MEPlist[var]['ErrorMessage']=""
-                MEPlist[var]['AdminState'] = MEPAdminState[MEPlist[var]['AdminState']]
-                MEPlist[var]['OperState'] = MEPOperState[MEPlist[var]['OperState']]
+                #MEPlist[var]['AdminState'] = MEPAdminState[MEPlist[var]['AdminState']]
+                #MEPlist[var]['OperState'] = MEPOperState[MEPlist[var]['OperState']]
 		MEPlist[var]['IcingaState']=""
-
 	return MEPlist
 
 
@@ -111,8 +110,8 @@ def checkMEP_CCM(mepEntry):
         if mepEntry['FailureFlag'] == '1': mepEntry['ErrorMessage'] += " -- Failure Error Detected!"
         if mepEntry['CCMErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- CCM Error Detected!"
         if mepEntry['RDIErrorFlag'] == '1': mepEntry['ErrorMessage'] += " -- RDI Error Detected!"
-        if (mepEntry['AdminState'] <> 'enabled') | (mepEntry['OperState'] <> 'enabled') :
-                mepEntry['ErrorMessage'] += " -- WARNING AdminState: " + mepEntry['AdminState'] + " OperState: " + mepEntry['OperState']
+        if ((int(mepEntry['AdminState']) == 1)) | ((int(mepEntry['OperState']) <> 0) & (int(mepEntry['OperState']) <> 2))  :
+                mepEntry['ErrorMessage'] += " -- WARNING AdminState: " + MEPAdminState[mepEntry['AdminState']] + " OperState: " + MEPOperState[mepEntry['OperState']]
         if len(mepEntry['ErrorMessage']) > 0:
                 ErrorState = 1
                 mepEntry['IcingaState'] = "WARNING"
@@ -120,7 +119,7 @@ def checkMEP_CCM(mepEntry):
                 ErrorState = 0
                 mepEntry['IcingaState'] = "OK"
 
-        print 'MEP {0:<4} {1} - Level: {2} MAID: {3:<20} {4}'.format(
+        print 'Remote MEP {0:<4} {1} - Level: {2} MAID: {3:<20} {4}'.format(
                                                                         mepEntry['ID'],
                                                                         mepEntry['IcingaState'],
                                                                         mepEntry['MdLevel'],
@@ -173,7 +172,7 @@ def main():
 					result = checkMEP_CCM(MEPDict[var])
 					if result == 1: ErrorState = 1
 			if mepFound == False:
-				print 'MEP {0:<4} NO DATA'.format(i)
+				print 'Remote MEP {0:<4} NO DATA'.format(i)
 				ErrorState = 1
 	
 	# Exit with value to inform Nagios / Icinga

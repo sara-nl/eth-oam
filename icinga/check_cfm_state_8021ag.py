@@ -12,7 +12,7 @@ from optparse import OptionParser
 from collections import defaultdict
 
 MEPPortStatus = {'0' : 'psNoPortStateTLV', '1' : 'psBlocked', '2' : 'psUp'}
-MEPInterfaceStatus = {'1' : 'isUp', '2' : 'isDown', '3' : 'isTesting', '4' : 'isUnknown', '5' : 'isDormant', '6' : 'isNotPresent', '7' : 'isLowerLayerDown'}
+MEPInterfaceStatus = {'0' : '0', '1' : 'isUp', '2' : 'isDown', '3' : 'isTesting', '4' : 'isUnknown', '5' : 'isDormant', '6' : 'isNotPresent', '7' : 'isLowerLayerDown'}
 
 
 # Parse and check arguments
@@ -90,7 +90,7 @@ def buildMEPDictionary(options,host):
         MEPEntry = snmp_walk(options, host, 'dot1agCfmMepDbTable')
         for var in MEPEntry:
                 MEPlist[var.iid].update({var.tag.replace("dot1agCfmMepDb", ""):var.val})
-
+	
         # Merge required MD and MA data into the MEPlist dictionary, and do parsing for some elements     
 
         for var in MEPlist:
@@ -102,11 +102,12 @@ def buildMEPDictionary(options,host):
                 MEPlist[var]['MdName'] = Mdlist[MdIndex].get('Name')
         	MEPlist[var]['NetName'] = Malist[MdIndex + '.' + MaIndex].get('NetName').strip()
                 MEPlist[var]['MAIDString'] = "{0}_{1}".format(MEPlist[var]['MdName'] , MEPlist[var]['NetName'])
-                MEPlist[var]['PortStatusTlv'] = MEPPortStatus[MEPlist[var]['PortStatusTlv']]
-                MEPlist[var]['InterfaceStatusTlv'] = MEPInterfaceStatus[MEPlist[var]['InterfaceStatusTlv']]
+		MEPlist[var]['MAIDString'] = MEPlist[var]['MAIDString'].replace('\x00',"")
+                #MEPlist[var]['PortStatusTlv'] = MEPPortStatus[MEPlist[var]['PortStatusTlv']]
+                #MEPlist[var]['InterfaceStatusTlv'] = MEPInterfaceStatus[MEPlist[var]['InterfaceStatusTlv']]
 		MEPlist[var]['ErrorMessage']=""
 		MEPlist[var]['IcingaState']=""
-	
+
 	return MEPlist
 
 
@@ -118,8 +119,8 @@ def checkMEP_CCM(mepEntry):
 
         if mepEntry['Rdi'] <> '2': mepEntry['ErrorMessage'] += " -- RDI Error Detected!"
         if mepEntry['RMepState'] <> '4': mepEntry['ErrorMessage'] += " -- Remote MEP State Error Detected!"
-        if (mepEntry['PortStatusTlv'] <> 'psUp') | (mepEntry['InterfaceStatusTlv'] <> 'isUp') :
-                mepEntry['ErrorMessage'] += " -- WARNING PortStatus: " + mepEntry['PortStatusTlv'] + " InterfaceStatusTlv: " + mepEntry['InterfaceStatusTlv']
+        if (int(mepEntry['PortStatusTlv']) == 1) | (int(mepEntry['InterfaceStatusTlv']) > 1) :
+                mepEntry['ErrorMessage'] += " -- PortStatus: " + MEPPortStatus[mepEntry['PortStatusTlv']] + " InterfaceStatusTlv: " + MEPInterfaceStatus[mepEntry['InterfaceStatusTlv']]
         
 	if len(mepEntry['ErrorMessage']) > 0:
                 ErrorState = 1
@@ -181,7 +182,7 @@ def main():
 					result = checkMEP_CCM(MEPDict[var])
 					if result == 1: ErrorState = 1
 			if mepFound == False:
-				print 'MEP {0:<4} NO DATA'.format(i)
+				print 'Remote MEP {0:<4} NO DATA'.format(i)
 				ErrorState = 1
 	
 	# Exit with value to inform Nagios / Icinga
