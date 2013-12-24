@@ -5,7 +5,6 @@ Inciga and/or Nagios script for monitoring Ethernet OAM CCM status for Juniper E
 """
 
 import sys
-import netsnmp
 from optparse import OptionParser
 from collections import defaultdict
 from ncclient import manager
@@ -58,7 +57,7 @@ def buildParser():
 
 def buildMEPDictionary(options,host):
 	"""
-	This function performs snmpwalks to generate a dictionary of the RemoteMEP table from the Ciena MIB.
+	This function performs Netconf calls to generate a dictionary of the RemoteMEP table from the Ciena MIB.
 	Some entries are parsed before the dictionary is returned.
 	"""
 	MEPlist= defaultdict(dict)
@@ -107,7 +106,7 @@ def buildMEPDictionary(options,host):
 		MEPlist[mep].update({"MAIDString":MEPlist[mep].get('Md')+"_"+ MEPlist[mep].get('Ma')})
 		MEPlist[mep].update({"CCMErrorFlag":0})
 		MEPlist[mep].update({"ErrorMessage":""})
-	print MEPlist	 
+	
 	return MEPlist	
 	
 def checkMEP_CCM(mepEntry):

@@ -1,0 +1,35 @@
+<interface>
+        <name>Juniper DMM Jitter / Delay Statistics</name>
+        <script_path>/usr/bin/python |path_cacti|/resource/script_queries/juniper_dmm.py</script_path>
+        <arg_prepend>|host_hostname| </arg_prepend>
+        <arg_index>index</arg_index>
+        <arg_query>query</arg_query>
+        <arg_get>get</arg_get>
+        <output_delimeter>!</output_delimeter>
+        <index_order>localMEP</index_order>
+        <index_order_type>numeric</index_order_type>
+        <index_title_format>|chosen_order_field|</index_title_format>
+
+        <fields>
+                <localMEP>
+                        <name>Index</name>
+                        <direction>input</direction>
+                        <query_name>index</query_name>
+                </localMEP>
+                <MEPinfo>
+                        <name>MEP info</name>
+                        <direction>input</direction>
+                        <query_name>mepinfo</query_name>
+                </MEPinfo>
+                <Delay>
+                        <name>Two-way Delay</name>
+                        <direction>output</direction>
+                        <query_name>delay</query_name>
+                </Delay>
+                <Jitter>
+                        <name>Two-way Jitter</name>
+                        <direction>output</direction>
+                        <query_name>jitter</query_name>
+                </Jitter>
+        </fields>
+</interface>

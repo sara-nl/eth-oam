@@ -40,7 +40,7 @@ def buildParser():
 	parser.add_option("-l", "--mdlevel", 
 		  	  dest="mdlevel",
 			  default="",
-                  	  help="OAM Maintentance Level", 
+                  	  help="OAM Maintenance Level", 
 		  	  metavar="MDLEVEL")
 	parser.add_option("-c", "--count", 
 		  	  dest="count", 
