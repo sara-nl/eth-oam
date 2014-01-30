@@ -84,16 +84,18 @@ def buildMEPDictionary(options,host):
 	MEPlist= defaultdict(dict)
 
 	# Try to connect to the remote host
-	
 	try:
-		conn = manager.connect(host=host, port=options.port, username=options.username, password=options.password) 
+		conn = manager.connect(host=host, port=options.port, username=options.username, password=options.password, hostkey_verify=False) 
+
 	except transport.AuthenticationError:
-		print "unable to connect, wrong username or password?"
-		quit()
+		print "unable to connect [" + host + "], wrong username or password?"
+		sys.exit(3)
+	except transport.SSHUnknownHostError:
+		print "Unknown host key for [" + host + "]"
+		sys.exit(3)
 	except transport.SSHError:
-		print "SSH unreachable"
-		quit()
-	
+		print "SSH unreachable for [" + host + "]"
+		sys.exit(3)	
 
 	# Get remote meps using netconf call
 	
